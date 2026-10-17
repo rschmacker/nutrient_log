@@ -16,15 +16,17 @@ header.top{display:flex;align-items:center;justify-content:space-between;padding
 .datebar button{background:var(--card);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;font-size:18px}
 .datebar .d{min-width:150px;text-align:center;font-weight:600}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.ring{display:flex;flex-direction:column;align-items:center;text-align:center}
-.ring svg{width:92px;height:92px}
-.ring .pct{font-size:18px;font-weight:700;fill:var(--ink)}
-.ring .lbl{font-size:13px;font-weight:600;margin-top:2px}
-.ring .val{font-size:12px;color:var(--muted)}
-.ring.big{grid-column:1/-1}
-.ring.big svg{width:150px;height:150px}
-.ring.big .pct{font-size:26px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ring{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.ring svg{width:100%;max-width:84px;height:auto}
+.ring .pct{font-size:20px;font-weight:700;fill:var(--ink)}
+.ring .lbl{font-size:12px;font-weight:600;margin-top:2px}
+.ring .val{font-size:11px;color:var(--muted);line-height:1.25}
+.tag{display:inline-block;font-size:11px;color:var(--green);border:1px solid var(--green);border-radius:6px;padding:0 5px;margin-left:4px;vertical-align:1px}
+.two-btn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg.two{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;margin:0 0 10px}
+.seg.two button{border:0;background:none;border-radius:9px;padding:9px 0;font-weight:600;color:var(--muted)}
+.seg.two button.on{background:var(--green);color:#fff}
 .entry{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
 .entry:first-child{border-top:0}
 .entry .n{flex:1;min-width:0}
