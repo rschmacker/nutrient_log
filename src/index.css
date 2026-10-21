@@ -766,3 +766,85 @@ input:focus {
 .nowrap {
   white-space: nowrap;
 }
+
+/* ---------- Lebensmittel ---------- */
+
+a.food-row {
+  text-decoration: none;
+}
+
+.section .food-list {
+  margin-top: 0;
+}
+
+.two-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* "+ Neues Lebensmittel": dashed, below a list */
+.card-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border: 2px dashed var(--line);
+  border-radius: 14px;
+  color: var(--accent-ink);
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+
+.card-add:active {
+  background: var(--pressed);
+}
+
+.list-note {
+  margin-top: 1.75rem;
+  font-size: 0.875rem;
+}
+
+.form-kind {
+  margin-top: 0;
+}
+
+.nutrient-fields {
+  min-width: 0;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  border: none;
+}
+
+.nutrient-fields legend {
+  margin-bottom: 0.625rem;
+  padding: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Two nutrient fields per row */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.form-grid .field {
+  min-width: 0;
+}
+
+/* Built-in foods: fields can't be changed, but stay easy to read */
+input:disabled {
+  opacity: 1;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-text-fill-color: var(--text);
+}

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import AmountSheet from '../components/AmountSheet'
 import BackLink from '../components/BackLink'
+import FoodRowContent from '../components/FoodRowContent'
 import { dayFromParam, dayLabel, dayPath } from '../dates'
 import { fetchFoods, type Food } from '../foods'
-import { formatNumber } from '../nutrients'
 import { useGoBack } from '../useGoBack'
 
 type Filter = 'all' | 'food' | 'dish' | 'own'
@@ -41,6 +41,12 @@ export default function AddFood() {
 
   const needle = search.trim().toLocaleLowerCase('de')
   const shown = foods?.filter((f) => matches(f, filter, needle)) ?? []
+
+  // "Not in the list": create it, with the search text as its name
+  const newParams = new URLSearchParams()
+  if (search.trim()) newParams.set('name', search.trim())
+  if (filter === 'dish') newParams.set('art', 'gericht')
+  const newFoodPath = `/lebensmittel/neu${newParams.toString() ? `?${newParams}` : ''}`
 
   return (
     <main className="page">
@@ -82,18 +88,17 @@ export default function AddFood() {
           {shown.map((food) => (
             <li key={food.id}>
               <button className="food-row" onClick={() => setSelected(food)}>
-                <span className="food-text">
-                  <span className="food-name">
-                    {food.name}
-                    {food.kind === 'dish' && <span className="tag">Gericht</span>}
-                  </span>
-                  <span className="food-portion">{food.portion}</span>
-                </span>
-                <span className="food-kcal">{formatNumber(food.kcal, 0)} kcal</span>
+                <FoodRowContent food={food} />
               </button>
             </li>
           ))}
         </ul>
+      )}
+
+      {foods !== null && (
+        <Link className="card-add" to={newFoodPath}>
+          {search.trim() ? `+ „${search.trim()}“ neu anlegen` : '+ Neues Lebensmittel oder Gericht'}
+        </Link>
       )}
 
       {selected && (

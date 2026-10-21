@@ -67,6 +67,15 @@ export function scaleNutrients(values: Nutrients, factor: number): Nutrients {
   return result
 }
 
+// Reads a typed amount: "3,5" or "3.5" (the iPhone keypad shows a comma in German).
+// Empty counts as 0. Returns null if it isn't a number.
+export function parseAmount(text: string): number | null {
+  const s = text.trim().replace(',', '.')
+  if (s === '') return 0
+  if (!/^\d+(\.\d+)?$/.test(s)) return null
+  return Number(s)
+}
+
 // German number format: "1.200", "3,5"
 export function formatNumber(value: number, decimals: number): string {
   return value.toLocaleString('de-DE', { maximumFractionDigits: decimals })

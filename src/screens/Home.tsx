@@ -51,6 +51,27 @@ function GearIcon() {
   )
 }
 
+// Apple outline with a stem and a leaf, for the "Lebensmittel" button
+function AppleIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 8.5C10.5 7 6.5 6.8 5.3 10 4.2 13 5.6 17.5 8 19.5c1.5 1.2 2.8.3 4 .3s2.5.9 4-.3c2.4-2 3.8-6.5 2.7-9.5-1.2-3.2-5.2-3-6.7-1.5z" />
+      <path d="M12 8.5c0-2 .5-3.5 1.5-4.5" />
+      <path d="M14 6c1.2-1.8 3-2.2 4.5-1.8-.6 1.6-2.3 2.4-4.5 1.8z" />
+    </svg>
+  )
+}
+
 // "Heute": rings for the selected day (or the 3-day average) and what was eaten
 export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -147,9 +168,14 @@ export default function Home() {
     <main className="page has-add-bar">
       <header className="topbar">
         <h1>Kleinkind-Essen</h1>
-        <Link className="icon-button" to="/einstellungen" aria-label="Einstellungen">
-          <GearIcon />
-        </Link>
+        <div className="topbar-actions">
+          <Link className="icon-button" to="/lebensmittel" aria-label="Lebensmittel und Gerichte">
+            <AppleIcon />
+          </Link>
+          <Link className="icon-button" to="/einstellungen" aria-label="Einstellungen">
+            <GearIcon />
+          </Link>
+        </div>
       </header>
 
       <div className="date-bar">

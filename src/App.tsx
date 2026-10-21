@@ -3,6 +3,8 @@ import { Link, Route, Routes } from 'react-router'
 import { ensureHousehold, forgetHousehold } from './household'
 import Login from './Login'
 import AddFood from './screens/AddFood'
+import FoodForm from './screens/FoodForm'
+import FoodList from './screens/FoodList'
 import Home from './screens/Home'
 import Settings from './screens/Settings'
 import { supabase } from './supabase'
@@ -71,6 +73,10 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/hinzufuegen" element={<AddFood />} />
+      <Route path="/lebensmittel" element={<FoodList />} />
+      {/* Different keys: going from a built-in food to "Eigene Version anlegen" starts a fresh form */}
+      <Route path="/lebensmittel/neu" element={<FoodForm key="new" />} />
+      <Route path="/lebensmittel/:id" element={<FoodForm key="edit" />} />
       <Route path="/einstellungen" element={<Settings email={session.user.email} />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
