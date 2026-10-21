@@ -833,3 +833,26 @@ input:disabled {
   color: var(--text);
   -webkit-text-fill-color: var(--text);
 }
+
+/* ---------- Einstellungen ---------- */
+
+/* A form right below a section heading doesn't need the extra space */
+.section h2 + .stack {
+  margin-top: 0;
+}
+
+.section-intro {
+  margin: 0 0 0.75rem;
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+/* Small text action at the end of a list row, e.g. "Zurücknehmen" */
+.row-action {
+  flex-shrink: 0;
+  padding: 0 0.75rem;
+  color: var(--accent-ink);
+  font-size: 0.875rem;
+}

@@ -1,12 +1,21 @@
 import BackLink from '../components/BackLink'
+import FamilySection from '../components/FamilySection'
+import TargetsForm from '../components/TargetsForm'
 import { supabase } from '../supabase'
 
-// Step 6 adds the targets and the family (inviting the other parent) here
-export default function Settings({ email }: { email: string | undefined }) {
+type Props = {
+  userId: string
+  email: string | undefined
+}
+
+export default function Settings({ userId, email }: Props) {
   return (
     <main className="page">
       <BackLink parent="/" />
       <h1>Einstellungen</h1>
+
+      <TargetsForm />
+      <FamilySection userId={userId} />
 
       <section className="section">
         <h2>Konto</h2>

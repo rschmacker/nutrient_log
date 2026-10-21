@@ -3,7 +3,7 @@ import { appUrl, loginErrorFromUrl, supabase } from './supabase'
 
 export default function Login() {
   const [email, setEmail] = useState('')
-  const [linkSent, setLinkSent] = useState(false)
+  const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(loginErrorFromUrl)
 
@@ -21,19 +21,27 @@ export default function Login() {
     }
   }
 
-  // Fallback: Supabase emails a login link. The link only works when opened in the
-  // same browser that requested it (on iPhone it opens in Safari, not the Home Screen app).
-  async function sendLink(e: FormEvent) {
+  // Email + password works everywhere, also in the Home Screen app, and needs no email.
+  // Accounts are created in Supabase (Authentication -> Users -> Add user), see README.
+  // (Login links or codes by email would need editable email templates, which this
+  // Supabase project doesn't allow with its built-in email sending.)
+  async function signInWithPassword(e: FormEvent) {
     e.preventDefault()
     setBusy(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
-      options: { emailRedirectTo: appUrl },
+      password,
     })
-    setBusy(false)
-    if (error) setError(error.message)
-    else setLinkSent(true)
+    // On success the session changes and the app shows the Heute screen
+    if (error) {
+      setError(
+        error.message === 'Invalid login credentials'
+          ? 'E-Mail-Adresse oder Passwort stimmt nicht.'
+          : error.message,
+      )
+      setBusy(false)
+    }
   }
 
   return (
@@ -46,40 +54,34 @@ export default function Login() {
           Mit GitHub anmelden
         </button>
 
-        <p className="divider">oder per E-Mail</p>
+        <p className="divider">oder mit E-Mail und Passwort</p>
 
-        {!linkSent ? (
-          <form className="stack" onSubmit={sendLink}>
-            <label className="field">
-              E-Mail
-              <input
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </label>
-            <button className="button secondary" disabled={busy}>
-              Anmeldelink schicken
-            </button>
-          </form>
-        ) : (
-          <div className="stack">
-            <p>
-              Wir haben einen Anmeldelink an <strong>{email.trim()}</strong> geschickt. Öffne ihn
-              in diesem Browser, um dich anzumelden.
-            </p>
-            <button
-              type="button"
-              className="link-button"
-              onClick={() => setLinkSent(false)}
-            >
-              Andere E-Mail verwenden
-            </button>
-          </div>
-        )}
+        <form className="stack" onSubmit={signInWithPassword}>
+          <label className="field">
+            E-Mail
+            <input
+              type="email"
+              inputMode="email"
+              autoComplete="username"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          <label className="field">
+            Passwort
+            <input
+              type="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+          <button className="button secondary" disabled={busy}>
+            Anmelden
+          </button>
+        </form>
 
         {error && <p className="error">{error}</p>}
       </div>

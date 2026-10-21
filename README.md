@@ -11,6 +11,21 @@ Die App nutzt dasselbe Supabase-Projekt wie das Workout Log.
 1. SQL Editor → New query → Inhalt von `supabase/schema.sql` einfügen → Run. Das Skript ist wiederholbar.
 2. Authentication → URL Configuration → Redirect URLs: `http://localhost:5173/nutrient_log/` und `https://rschmacker.github.io/nutrient_log/` hinzufügen.
 3. `.env.example` nach `.env.local` kopieren und URL und anon-Key eintragen (dieselben Werte wie im Workout Log).
+4. Änderungen danach: die Dateien in `supabase/migrations/` der Reihe nach im SQL Editor ausführen (jede ist wiederholbar).
+
+## Anmelden
+
+Mit GitHub oder mit E-Mail und Passwort. Beides funktioniert auch in der App auf dem Home-Bildschirm. Anmeldelinks oder Codes per E-Mail gibt es nicht: Dafür müsste man die E-Mail-Vorlagen in Supabase ändern, und das geht bei diesem Projekt mit dem eingebauten E-Mail-Versand nicht.
+
+## Familie
+
+Alle in einer Familie sehen dieselben Einträge, Lebensmittel und Richtwerte.
+
+1. In der App unter Einstellungen → Familie die E-Mail-Adresse der anderen Person einladen.
+2. In Supabase das Konto anlegen: Authentication → Users → Add user → Create new user. E-Mail-Adresse und ein Passwort eingeben, „Auto Confirm User“ anhaken.
+3. Die andere Person meldet sich in der App mit dieser E-Mail-Adresse und dem Passwort an und ist automatisch in der Familie.
+
+Passwort vergessen: In Supabase unter Authentication → Users das Konto löschen, in der App neu einladen und das Konto mit neuem Passwort wieder anlegen. Die Einträge gehören der Familie und bleiben erhalten.
 
 ## Lokal starten
 

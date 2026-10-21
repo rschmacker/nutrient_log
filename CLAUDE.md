@@ -8,7 +8,7 @@ The first version was plain JavaScript without a build step (commit `ce8cca8`). 
 
 ## Stack (same as the workout log)
 - Vite + React + TypeScript
-- Supabase (Postgres + Auth) for online storage; login via "Sign in with GitHub" (email magic link as fallback)
+- Supabase (Postgres + Auth) for online storage; login via "Sign in with GitHub" or email + password (accounts created in the Supabase dashboard)
 - Same Supabase project as the workout log (same URL and anon key, same users); the table names don't overlap with the workout tables
 - Hosting: GitHub Pages, deployed with a GitHub Actions workflow
 - HashRouter (not BrowserRouter) so GitHub Pages does not 404 on reload
@@ -44,7 +44,11 @@ These are guidance values for an average over several days, not goals for a sing
 3. **Lebensmittel (`/lebensmittel`)**: sections "Meine Gerichte", "Eigene Lebensmittel", "Mitgeliefert"; buttons "+ Lebensmittel" and "+ Gericht". Own foods and dishes can be edited and deleted (deleting keeps already logged entries). Built-in foods are read-only: tapping one shows its values and offers "Eigene Version anlegen" (a new own food prefilled with its values).
    - Form (`/lebensmittel/neu`, `/lebensmittel/<id>`): Lebensmittel / Gericht, name, portion text (e.g. "1 Scheibe (40 g)"), 8 nutrient values per portion (comma or dot, empty counts as 0). Dishes are home-cooked meals whose values per portion come from another app. Names are unique per household (friendly message if not)
    - Hinzufügen links to the form at the end of its list ("+ „…“ neu anlegen", name prefilled from the search)
-4. **Einstellungen**: edit the targets, reset to the DGE defaults, short explanation of the reference values; Familie (members, invite the other parent by email, pending invite); account (signed in as …, sign out).
+4. **Einstellungen (`/einstellungen`, gear icon)**:
+   - Richtwerte: the 8 daily targets (shared by the family, numbers > 0), "DGE-Werte einsetzen" fills in the defaults (saved with "Speichern"), short explanation of the reference values
+   - Familie: members (with email, "Das bist du"), pending invites with "Zurücknehmen", invite by email
+   - Konto: signed in as …, sign out
+5. **Login**: "Mit GitHub anmelden", or email + password (both work in the Home Screen app). No login links or codes by email: links only log in the browser they open in, and codes would need edited email templates, which this Supabase project doesn't allow with the built-in email sending (2026-10-21)
 
 Navigation like the workout log: separate screens with a "‹ Zurück" link that goes one level up; no bottom tab bar.
 
@@ -59,14 +63,14 @@ Navigation like the workout log: separate screens with a "‹ Zurück" link that
 ## Data model (Supabase)
 All data belongs to a **household** (both parents), not to a single user.
 - `households`: id, created_at
-- `household_members`: user_id (primary key, one household per user), household_id
-- `household_invites`: email (primary key, lowercase), household_id. Whoever logs in for the first time with this email joins that household
+- `household_members`: user_id (primary key, one household per user), household_id, email (shown in Einstellungen)
+- `household_invites`: email (primary key, lowercase), household_id (defaults to the inviting person's household). Whoever logs in with this email joins that household
 - `foods`: id (uuid), household_id (null for built-in foods), name, portion (text), kind (`food` | `dish`), kcal, protein, carbs, fat, fiber (g), iron (mg), calcium (mg), omega3 (g), created_at. Nutrient values are per portion. Unique (household_id, name)
 - `food_entries`: id, household_id, food_id (fk, set null when the food is deleted), name, portion, portions (numeric), the 8 nutrient values for the whole amount, eaten_on (date, the phone's local date), created_at. Entries copy the values at logging time, so later changes to a food don't change past days
 - `nutrient_targets`: household_id (primary key) and the 8 target values; no row = DGE defaults
 - Built-in foods: the 28 foods from the first version plus 6 added on 2026-10-21 (seeded in `supabase/schema.sql`, updated in place when the file is run again). New built-in foods go into `schema.sql` and into a migration file with the values per 100 g in a comment
 - `my_household_id()`: the logged-in user's household; used in the access rules and as the column default, so the app never sends household_id
-- `ensure_household()`: the app calls it once after login (`src/household.ts`); joins an invited household or creates one on the first login. An invite only works if it exists before the invited person's first login
+- `ensure_household()`: the app calls it once after login (`src/household.ts`); joins an invited household or creates one on the first login, and stores the email. Someone who logged in before being invited is moved to the inviting household, but only if their own household is still empty (no other member, no own foods, entries or targets), so nothing is lost
 
 ## Security (important, the app is publicly reachable)
 - Enable Row Level Security on every table; no access for anonymous visitors
@@ -82,7 +86,7 @@ All data belongs to a **household** (both parents), not to a single user.
   3. Heute screen: date bar, rings, entry list, delete
   4. Hinzufügen: search, filters, amount, save
   5. Lebensmittel: own foods and dishes
-  6. Einstellungen: targets, Familie (invite my partner) and account. My partner probably has no GitHub account, so the email login should also offer a code from the email that can be typed into the app (the link alone doesn't log in the Home Screen app)
+  6. Einstellungen: targets, Familie (invite my partner) and account. My partner probably has no GitHub account, so they log in with email + password
   7. GitHub Pages deployment
 - Mobile-first: large touch targets (at least 44 px), numeric keypad for numbers (`inputMode="decimal"`), light and dark mode following the phone setting
 - Keep dependencies minimal; explain any new package before adding it

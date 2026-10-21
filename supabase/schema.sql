@@ -16,15 +16,16 @@ create table if not exists public.households (
 create table if not exists public.household_members (
   user_id uuid primary key references auth.users (id) on delete cascade,
   household_id uuid not null references public.households (id) on delete cascade,
+  email text, -- shown in Einstellungen -> Familie (added 2026-10-21)
   created_at timestamptz not null default now()
 );
 
--- Invitations: whoever logs in for the first time with this email joins the household
-create table if not exists public.household_invites (
-  email text primary key check (email = lower(trim(email)) and email like '%_@_%'),
-  household_id uuid not null references public.households (id) on delete cascade,
-  created_at timestamptz not null default now()
-);
+-- For databases created before the email column existed
+-- (also in migrations/2026-10-21_family.sql)
+alter table public.household_members add column if not exists email text;
+update public.household_members m set email = lower(u.email)
+from auth.users u
+where u.id = m.user_id and m.email is null;
 
 -- The household of the logged-in user (null if not logged in or not in one yet).
 -- Used by the access rules below and as the default for new rows, so the app
@@ -40,8 +41,21 @@ as $$
   select household_id from public.household_members where user_id = (select auth.uid())
 $$;
 
--- Called by the app right after login. Returns the user's household; on the very
--- first login it joins the household that invited this email, or creates a new one.
+-- Invitations: whoever logs in with this email joins the household of the inviting person
+create table if not exists public.household_invites (
+  email text primary key check (email = lower(trim(email)) and email like '%_@_%'),
+  household_id uuid not null default public.my_household_id()
+    references public.households (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+-- For databases created before invites had this default (2026-10-21)
+alter table public.household_invites alter column household_id set default public.my_household_id();
+
+-- Called by the app right after login. Returns the user's household: on the first login
+-- it joins the household that invited this email, or creates a new one. Someone who
+-- logged in before being invited is moved over too, but only if their own household is
+-- still empty, so nothing gets lost.
 create or replace function public.ensure_household()
 returns uuid
 language plpgsql
@@ -52,6 +66,7 @@ declare
   uid uuid := auth.uid();
   my_email text := lower(auth.jwt() ->> 'email');
   hid uuid;
+  invited uuid;
 begin
   if uid is null then
     raise exception 'Not logged in';
@@ -61,16 +76,38 @@ begin
   perform pg_advisory_xact_lock(hashtext('ensure_household ' || uid::text));
 
   select household_id into hid from public.household_members where user_id = uid;
+  select household_id into invited from public.household_invites where email = my_email;
+
+  -- Keep the stored email up to date
+  update public.household_members set email = my_email
+  where user_id = uid and email is distinct from my_email;
+
+  if invited is not null then
+    if invited = hid then
+      -- Already in that household: the invite isn't needed any more
+      delete from public.household_invites where email = my_email;
+    elsif hid is null or (
+      -- Logged in before being invited: move over, but only if the own household is
+      -- still empty (nobody else, no own foods, entries or targets), so nothing is lost
+      not exists (select 1 from public.household_members where household_id = hid and user_id <> uid)
+      and not exists (select 1 from public.foods where household_id = hid)
+      and not exists (select 1 from public.food_entries where household_id = hid)
+      and not exists (select 1 from public.nutrient_targets where household_id = hid)
+    ) then
+      delete from public.household_invites where email = my_email;
+      delete from public.households where id = hid; -- also removes the old membership
+      insert into public.household_members (user_id, household_id, email)
+      values (uid, invited, my_email);
+      return invited;
+    end if;
+  end if;
+
   if hid is not null then
     return hid;
   end if;
 
-  delete from public.household_invites where email = my_email returning household_id into hid;
-  if hid is null then
-    insert into public.households default values returning id into hid;
-  end if;
-
-  insert into public.household_members (user_id, household_id) values (uid, hid);
+  insert into public.households default values returning id into hid;
+  insert into public.household_members (user_id, household_id, email) values (uid, hid, my_email);
   return hid;
 end;
 $$;
