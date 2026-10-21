@@ -1,21 +1,39 @@
 <!doctype html>
 <html lang="de">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#2f7d5b">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Kleinkind-Essen">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg">
-<link rel="apple-touch-icon" href="icon.svg">
-<link rel="stylesheet" href="style.css">
-<title>Kleinkind-Essen</title>
-</head>
-<body>
-<div id="app"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- viewport-fit=cover lets the app draw under the iPhone notch / home bar;
+         we then pad the content with the safe-area insets in index.css -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Kleinkind-Essen</title>
+    <meta
+      name="description"
+      content="Loggen, was ein Kleinkind isst, und die Nährwerte mit den DGE-Richtwerten vergleichen."
+    />
+
+    <!-- Browser tab icon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- PWA manifest (name, icons, standalone display) -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- Status bar / browser bar color, matching the app's light and dark mode -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f4ef" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161b18" />
+
+    <!-- iPhone Home Screen support (Safari reads these, not the manifest icons) -->
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Kleinkind-Essen" />
+    <!-- "default": iOS draws a normal status bar in the theme color, with dark or light
+         text as needed ("black-translucent" always has white text, unreadable in light mode) -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

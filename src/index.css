@@ -1,0 +1,256 @@
+:root {
+  /* Colors for dark mode (light mode below). All text colors are checked
+     for at least 4.5:1 contrast. */
+  --bg: #161b18;
+  --surface: #1f2622; /* cards, tiles, inputs */
+  --pressed: #2e3832; /* card / button background while pressed */
+  --text: #eef2ee;
+  --muted: #93a39a;
+  --accent: #2f7d5b; /* green fills: buttons, selected chips */
+  --accent-text: #ffffff; /* text on green fills */
+  --accent-ink: #5fbf8f; /* green text and icons: links, − / + */
+  --line: #2e3832; /* borders */
+  --error: #fca5a5;
+  --danger-line: #f87171;
+  --success: #86efac;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 14px rgb(0 0 0 / 0.25);
+
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Light mode: follows the phone's appearance setting (Settings → Display & Brightness) */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f6f4ef;
+    --surface: #ffffff;
+    --pressed: #ebe8e0;
+    --text: #23302a;
+    --muted: #5c6b63;
+    --accent-ink: #2f7d5b;
+    --line: #e4e0d6;
+    --error: #b91c1c;
+    --danger-line: #dc2626;
+    --success: #166534;
+    --shadow: 0 1px 2px rgb(35 48 42 / 0.06), 0 4px 14px rgb(35 48 42 / 0.08);
+
+    color-scheme: light;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  /* Keep content clear of the notch and home bar when running full-screen on iPhone */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  /* Never scroll sideways */
+  overflow-x: hidden;
+  /* Remove the grey flash when tapping on iOS */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+
+/* Subtle press feedback: tappable things shrink a little while pressed */
+.button,
+.pill-link {
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease;
+}
+
+.button:active:not(:disabled),
+.pill-link:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .pill-link {
+    transition: none;
+  }
+
+  .button:active,
+  .pill-link:active {
+    transform: none;
+  }
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* Large touch target (at least 44px tall, as Apple recommends) */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 1.25rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.5;
+}
+
+.button.secondary {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.button.danger {
+  background: none;
+  border: 1px solid var(--danger-line);
+  color: var(--error);
+}
+
+.link-button {
+  min-height: 44px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  text-decoration: underline;
+}
+
+/* Vertical layout with even spacing; buttons stretch to full width */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.stack form.stack {
+  margin-top: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* 16px font size stops iPhone Safari from zooming in when you tap the field */
+input {
+  min-height: 48px;
+  padding: 0 0.875rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+
+input:focus {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 1px;
+}
+
+.divider {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.error {
+  margin: 0;
+  color: var(--error);
+}
+
+.success {
+  margin: 0;
+  color: var(--success);
+}
+
+/* Title on the left, small actions on the right */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.topbar h1 {
+  margin: 0;
+}
+
+.topbar-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pill-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--accent-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 0.5rem;
+  color: var(--accent-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.section {
+  margin-top: 1.75rem;
+}
+
+.section h2 {
+  margin: 0 0 0.625rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
