@@ -38,7 +38,7 @@ These are guidance values for an average over several days, not goals for a sing
 
 ## Screens
 1. **Heute (Home, `/`, earlier days `/?tag=YYYY-MM-DD`)**: date bar with previous / next day (no future days); toggle "Ø 3 Tage" (the default) / "Tageswerte" (remembered on the device); 8 progress rings showing % of target, with value and target below; list of the day's entries (name, amount × portion, kcal) with delete (asks first); "+ Essen eintragen" button fixed at the bottom. Apple icon ("Lebensmittel") and gear icon ("Einstellungen") in the top bar.
-   - Rings: all in the app's green (the name below identifies each ring, so color doesn't need to); clearly over the target (> 125 %) the ring turns orange and the percentage gets a ▲, never color alone. Ring colors are checked for at least 3:1 contrast in light and dark mode (see `--ring`, `--over` in `index.css`)
+   - Rings: all in the app's green (the name below identifies each ring, so color doesn't need to). At 100 % and above the ring is simply full and the percentage shows how much; no warning colors or symbols for values over the target (see Decisions). Ring colors are checked for at least 3:1 contrast in light and dark mode (`--ring` in `index.css`)
    - Tapping a ring opens a panel: which foods the value comes from (same name added up, largest first), each with value, share in % and a bar compared with the largest. In Ø mode the values are per day, so the rows add up to the ring
 2. **Hinzufügen (`/hinzufuegen`, same `?tag=`)**: search field, filter chips Alle / Lebensmittel / Gerichte / Eigene, list of foods (name, portion, kcal). Tapping a food opens a panel from the bottom: stepper in steps of 0.25 portions (start 1, min 0.25) with a live preview of kcal, Eiweiß, Eisen and Omega-3; "Eintragen" saves it for the selected day and returns to Heute.
 3. **Lebensmittel (`/lebensmittel`)**: sections "Meine Gerichte", "Eigene Lebensmittel", "Mitgeliefert"; buttons "+ Lebensmittel" and "+ Gericht". Own foods and dishes can be edited and deleted (deleting keeps already logged entries). Built-in foods are read-only: tapping one shows its values and offers "Eigene Version anlegen" (a new own food prefilled with its values).
@@ -88,3 +88,6 @@ All data belongs to a **household** (both parents), not to a single user.
 - Keep dependencies minimal; explain any new package before adding it
 - Keep code simple and readable; I am not a professional web developer
 - After each step, tell me exactly what to run or click to test it, and what manual setup (Supabase, GitHub settings) I need to do myself
+
+## Decisions
+- No warning colors, arrows or other alarm signals when a value is over the target, anywhere in the app (2026-10-21: it causes stress). Rings stay green, the percentage alone shows how much

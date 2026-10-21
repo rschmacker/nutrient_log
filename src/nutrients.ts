@@ -46,9 +46,6 @@ export const DGE_TARGETS: Nutrients = {
   omega3: 0.7,
 }
 
-// Above this share of the target a ring is marked as "clearly over"
-export const OVER_TARGET = 1.25
-
 export function sumNutrients(rows: Nutrients[]): Nutrients {
   const total = {} as Nutrients
   for (const n of NUTRIENTS) total[n.key] = 0

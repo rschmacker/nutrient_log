@@ -1,4 +1,4 @@
-import { formatNumber, OVER_TARGET, type Nutrient } from '../nutrients'
+import { formatNumber, type Nutrient } from '../nutrients'
 
 const RADIUS = 40
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
@@ -10,23 +10,21 @@ type Props = {
   onOpen: () => void // tapping the ring shows which foods the value comes from
 }
 
-// Progress ring: how much of the daily target is reached. The ring is full at 100 %;
-// clearly over the target it turns orange and the percentage gets a ▲ (never color alone).
+// Progress ring: how much of the daily target is reached. Always green; at 100 % and
+// above the ring is simply full and the percentage shows how much (no warning colors).
 export default function NutrientRing({ nutrient, value, target, onOpen }: Props) {
   const ratio = target > 0 ? value / target : 0
   const percent = Math.round(ratio * 100)
-  const over = ratio > OVER_TARGET
   const filled = Math.min(ratio, 1) * CIRCUMFERENCE
-  const percentText = `${over ? '▲' : ''}${percent}%`
+  const percentText = `${percent}%`
   const valueText = `${formatNumber(value, nutrient.decimals)} ${nutrient.unit}`
   const targetText = formatNumber(target, nutrient.decimals)
   const description =
-    `${nutrient.label}: ${valueText} von ${targetText} ${nutrient.unit}, ${percent} Prozent` +
-    (over ? ', deutlich über dem Richtwert' : '') +
-    '. Zeigt, woher der Wert kommt.'
+    `${nutrient.label}: ${valueText} von ${targetText} ${nutrient.unit}, ${percent} Prozent. ` +
+    'Zeigt, woher der Wert kommt.'
 
   return (
-    <button className={over ? 'ring over' : 'ring'} aria-label={description} onClick={onOpen}>
+    <button className="ring" aria-label={description} onClick={onOpen}>
       <svg viewBox="0 0 100 100" aria-hidden="true">
         <circle className="ring-track" cx="50" cy="50" r={RADIUS} />
         {filled > 0 && (

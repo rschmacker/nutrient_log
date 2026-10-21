@@ -1,5 +1,5 @@
 import type { FoodEntry } from '../entries'
-import { formatNumber, OVER_TARGET, type Nutrient } from '../nutrients'
+import { formatNumber, type Nutrient } from '../nutrients'
 import Sheet from './Sheet'
 
 type Props = {
@@ -36,7 +36,6 @@ export default function NutrientSheet(props: Props) {
   const rows = contributions(entries, nutrient, days)
   const total = rows.reduce((sum, row) => sum + row.value, 0)
   const largest = rows[0]?.value ?? 0
-  const over = target > 0 && value / target > OVER_TARGET
   const unit = nutrient.unit
 
   return (
@@ -51,11 +50,7 @@ export default function NutrientSheet(props: Props) {
         <span className="nowrap">
           {formatNumber(target, nutrient.decimals)} {unit}
         </span>{' '}
-        ·{' '}
-        <span className={over ? 'over-text nowrap' : 'nowrap'}>
-          {over && '▲ '}
-          {Math.round((value / target) * 100)} %
-        </span>
+        · <span className="nowrap">{Math.round((value / target) * 100)} %</span>
       </p>
 
       {rows.length === 0 ? (

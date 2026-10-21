@@ -15,7 +15,6 @@
   --success: #86efac;
   --ring: #5fbf8f; /* filled part of a nutrient ring (6.9:1 on --surface) */
   --ring-track: #2f4339; /* empty part of a ring */
-  --over: #ec835a; /* clearly over the target: ring and ▲ percentage (5.9:1 on --surface) */
   --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 14px rgb(0 0 0 / 0.25);
   --overlay-shadow: 0 8px 24px rgb(0 0 0 / 0.45);
 
@@ -40,7 +39,6 @@
     --success: #166534;
     --ring: #2f7d5b; /* 5.0:1 on white */
     --ring-track: #dcebe2;
-    --over: #c2410c; /* 5.2:1 on white */
     --shadow: 0 1px 2px rgb(35 48 42 / 0.06), 0 4px 14px rgb(35 48 42 / 0.08);
     --overlay-shadow: 0 8px 24px rgb(35 48 42 / 0.16);
 
@@ -431,17 +429,9 @@ input:focus {
   font-variant-numeric: tabular-nums;
 }
 
-/* "▲255%" and other long values get a smaller size so they fit inside the ring */
+/* Long percentages ("1000%") get a smaller size so they fit inside the ring */
 .ring-percent.long {
   font-size: 15px;
-}
-
-.ring.over .ring-fill {
-  stroke: var(--over);
-}
-
-.ring.over .ring-percent {
-  fill: var(--over);
 }
 
 .ring-name {
@@ -715,11 +705,6 @@ input:focus {
 }
 
 /* ---------- Ring details: which foods a value comes from ---------- */
-
-.over-text {
-  color: var(--over);
-  font-weight: 600;
-}
 
 .sheet .contrib-empty {
   margin-top: 1.25rem;
