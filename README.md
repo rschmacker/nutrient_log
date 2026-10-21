@@ -36,7 +36,18 @@ npm run dev
 
 Dann die angezeigte Adresse öffnen (`http://localhost:5173/nutrient_log/`). Auf dem iPhone im selben WLAN die „Network“-Adresse öffnen.
 
-Die Veröffentlichung auf GitHub Pages folgt in Schritt 7.
+## Veröffentlichen (GitHub Pages)
+
+Die App läuft unter https://rschmacker.github.io/nutrient_log/. Jeder Push auf `main` baut sie neu und veröffentlicht sie (GitHub → Actions → „Deploy to GitHub Pages“, dauert etwa eine Minute).
+
+Einmalige Einrichtung:
+
+1. Repository `nutrient_log` auf GitHub anlegen (öffentlich, ohne README).
+2. Settings → Secrets and variables → Actions: `VITE_SUPABASE_URL` und `VITE_SUPABASE_ANON_KEY` mit denselben Werten wie in `.env.local` anlegen.
+3. Settings → Pages → Build and deployment → Source: „GitHub Actions“.
+4. In Supabase unter Authentication → URL Configuration → Redirect URLs muss `https://rschmacker.github.io/nutrient_log/` stehen (für „Mit GitHub anmelden“).
+
+Auf dem iPhone die Adresse in Safari öffnen → Teilen → „Zum Home-Bildschirm“.
 
 ## Hinweise
 
