@@ -1,12 +1,5 @@
-import { addDays } from './dates'
 import type { Food } from './foods'
-import {
-  formatNumber,
-  NUTRIENT_COLUMNS,
-  scaleNutrients,
-  sumNutrients,
-  type Nutrients,
-} from './nutrients'
+import { formatNumber, NUTRIENT_COLUMNS, scaleNutrients, type Nutrients } from './nutrients'
 import { supabase } from './supabase'
 
 // One logged food. The nutrient values are for the whole amount (portion x portions).
@@ -16,13 +9,14 @@ export type FoodEntry = Nutrients & {
   portion: string
   portions: number
   eaten_on: string // "YYYY-MM-DD"
+  created_at: string // when it was logged (ISO timestamp)
 }
 
 // Loads the entries from `from` to `to` (both included), in the order they were logged
 export async function fetchEntries(from: string, to: string): Promise<FoodEntry[]> {
   const { data, error } = await supabase
     .from('food_entries')
-    .select(`id, name, portion, portions, eaten_on, ${NUTRIENT_COLUMNS}`)
+    .select(`id, name, portion, portions, eaten_on, created_at, ${NUTRIENT_COLUMNS}`)
     .gte('eaten_on', from)
     .lte('eaten_on', to)
     .order('created_at')
@@ -47,18 +41,6 @@ export async function addEntry(food: Food, portions: number, day: string) {
 export async function deleteEntry(id: string) {
   const { error } = await supabase.from('food_entries').delete().eq('id', id)
   if (error) throw error
-}
-
-// Ø 3 Tage: the day and the two days before it. Days without entries don't count,
-// so with only one or two logged days it is the average of those days.
-// `entries` must cover the 3 days.
-export function threeDayAverage(entries: FoodEntry[], day: string) {
-  const days = [addDays(day, -2), addDays(day, -1), day]
-  const inRange = entries.filter((e) => days.includes(e.eaten_on))
-  const countedDays = days.filter((d) => inRange.some((e) => e.eaten_on === d))
-  const total = sumNutrients(inRange)
-  const values = scaleNutrients(total, 1 / Math.max(countedDays.length, 1))
-  return { values, countedDays, from: days[0], to: day }
 }
 
 // Short summary of an entry for the list, e.g. "1,5 × 1 Scheibe (40 g) · 135 kcal"

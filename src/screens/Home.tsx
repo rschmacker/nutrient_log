@@ -1,15 +1,25 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
+import { threeDayAverage } from '../average'
 import NutrientRing from '../components/NutrientRing'
-import { addDays, dayFromParam, dayLabel, dayPath, shortDate, todayISO } from '../dates'
+import NutrientSheet from '../components/NutrientSheet'
 import {
-  deleteEntry,
-  entrySummary,
-  fetchEntries,
-  threeDayAverage,
-  type FoodEntry,
-} from '../entries'
-import { DGE_TARGETS, NUTRIENTS, sumNutrients, type Nutrients } from '../nutrients'
+  addDays,
+  dayFromParam,
+  dayLabel,
+  dayPath,
+  shortDate,
+  todayISO,
+  weekdayAndTime,
+} from '../dates'
+import { deleteEntry, entrySummary, fetchEntries, type FoodEntry } from '../entries'
+import {
+  DGE_TARGETS,
+  NUTRIENTS,
+  sumNutrients,
+  type Nutrient,
+  type Nutrients,
+} from '../nutrients'
 import { fetchTargets } from '../targets'
 
 // Remembers "Ø 3 Tage" (the default) or "Tageswerte" on this device
@@ -48,9 +58,12 @@ export default function Home() {
   const today = todayISO()
   const [showAverage, setShowAverage] = useState(loadAverageChoice)
   const [targets, setTargets] = useState<Nutrients | null>(null)
-  // Entries of the day and the 2 days before it (for Ø 3 Tage), and which day they are for
+  // Entries of the day and the 3 days before it (the 72 hours of Ø 3 Tage can start
+  // 3 days back), and which day they are for
   const [loaded, setLoaded] = useState<{ day: string; entries: FoodEntry[] } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // The ring that was tapped (its details panel is open)
+  const [openNutrient, setOpenNutrient] = useState<Nutrient | null>(null)
 
   useEffect(() => {
     fetchTargets().then(setTargets, (e: Error) => setError(e.message))
@@ -58,7 +71,7 @@ export default function Home() {
 
   useEffect(() => {
     let current = true // ignore the answer if the day changed in the meantime
-    fetchEntries(addDays(day, -2), day).then(
+    fetchEntries(addDays(day, -3), day).then(
       (entries) => {
         if (current) setLoaded({ day, entries })
       },
@@ -96,23 +109,39 @@ export default function Home() {
   const entries = loaded?.entries ?? []
   const dayEntries = entries.filter((e) => e.eaten_on === day)
 
+  // What the rings show, plus the entries and divisor behind them (for the ring details)
   let values: Nutrients
+  let ringEntries: FoodEntry[]
+  let days = 1
+  let perDayText: string
   let caption: string
   if (showAverage) {
     const average = threeDayAverage(entries, day)
-    const n = average.countedDays.length
     values = average.values
-    caption =
-      n > 0
-        ? `Ø pro Tag über ${n} ${n === 1 ? 'Tag' : 'Tage'} mit Einträgen ` +
-          `(${average.countedDays.map(shortDate).join(', ')}), Anteil am Tagesrichtwert.`
-        : `Vom ${shortDate(average.from)} bis ${shortDate(average.to)} gibt es noch keine Einträge.`
+    ringEntries = average.entries
+    days = average.days
+    perDayText = 'pro Tag (Ø 3 Tage)'
+    if (average.entries.length === 0) {
+      caption = `Vom ${shortDate(average.from)} bis ${shortDate(average.to)} gibt es keine Einträge.`
+    } else {
+      caption =
+        (average.rolling
+          ? `Ø pro Tag in den letzten 72 Stunden (seit ${weekdayAndTime(average.start)})`
+          : `Ø pro Tag vom ${shortDate(average.from)} bis ${shortDate(average.to)}` +
+            (day === today ? ' (heute ist noch nichts eingetragen)' : '')) +
+        ', Anteil am Tagesrichtwert.' +
+        (average.skipsTime ? ' Tage ohne Einträge zählen nicht mit.' : '') +
+        ' Tippe auf einen Ring für Details.'
+    }
   } else {
     values = sumNutrients(dayEntries)
+    ringEntries = dayEntries
+    perDayText = day === today ? 'heute' : `am ${shortDate(day)}`
     caption =
       'Anteil am Tagesrichtwert (DGE, 1 bis unter 4 Jahre). Die Richtwerte gelten für den ' +
-      'Durchschnitt über mehrere Tage.'
+      'Durchschnitt über mehrere Tage. Tippe auf einen Ring für Details.'
   }
+  const targetValues = targets ?? DGE_TARGETS
 
   return (
     <main className="page has-add-bar">
@@ -160,7 +189,8 @@ export default function Home() {
               key={n.key}
               nutrient={n}
               value={values[n.key]}
-              target={(targets ?? DGE_TARGETS)[n.key]}
+              target={targetValues[n.key]}
+              onOpen={() => setOpenNutrient(n)}
             />
           ))}
         </div>
@@ -197,6 +227,18 @@ export default function Home() {
           + Essen eintragen
         </Link>
       </div>
+
+      {openNutrient && (
+        <NutrientSheet
+          nutrient={openNutrient}
+          value={values[openNutrient.key]}
+          target={targetValues[openNutrient.key]}
+          entries={ringEntries}
+          days={days}
+          perDayText={perDayText}
+          onClose={() => setOpenNutrient(null)}
+        />
+      )}
     </main>
   )
 }

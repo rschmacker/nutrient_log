@@ -39,6 +39,7 @@ These are guidance values for an average over several days, not goals for a sing
 ## Screens
 1. **Heute (Home, `/`, earlier days `/?tag=YYYY-MM-DD`)**: date bar with previous / next day (no future days); toggle "Ø 3 Tage" (the default) / "Tageswerte" (remembered on the device); 8 progress rings showing % of target, with value and target below; list of the day's entries (name, amount × portion, kcal) with delete (asks first); "+ Essen eintragen" button fixed at the bottom. Gear icon for "Einstellungen" in the top bar; "Lebensmittel" link comes with step 5.
    - Rings: all in the app's green (the name below identifies each ring, so color doesn't need to); clearly over the target (> 125 %) the ring turns orange and the percentage gets a ▲, never color alone. Ring colors are checked for at least 3:1 contrast in light and dark mode (see `--ring`, `--over` in `index.css`)
+   - Tapping a ring opens a panel: which foods the value comes from (same name added up, largest first), each with value, share in % and a bar compared with the largest. In Ø mode the values are per day, so the rows add up to the ring
 2. **Hinzufügen (`/hinzufuegen`, same `?tag=`)**: search field, filter chips Alle / Lebensmittel / Gerichte / Eigene, list of foods (name, portion, kcal). Tapping a food opens a panel from the bottom: stepper in steps of 0.25 portions (start 1, min 0.25) with a live preview of kcal, Eiweiß, Eisen and Omega-3; "Eintragen" saves it for the selected day and returns to Heute.
 3. **Lebensmittel**: sections "Meine Gerichte", "Eigene Lebensmittel", "Vorgegeben"; buttons "+ Lebensmittel" and "+ Gericht". Own foods and dishes can be edited and deleted (deleting keeps already logged entries); built-in foods are read-only, tapping one logs it. Form: name, portion text (e.g. "1 Scheibe (40 g)"), 8 nutrient values per portion (empty counts as 0). Dishes are home-cooked meals whose values per portion come from another app.
 4. **Einstellungen**: edit the targets, reset to the DGE defaults, short explanation of the reference values; Familie (members, invite the other parent by email, pending invite); account (signed in as …, sign out).
@@ -47,7 +48,10 @@ Navigation like the workout log: separate screens with a "‹ Zurück" link that
 
 ## Calculations
 - Day total: sum of the day's entries
-- Ø 3 Tage: the selected day (also today, even though it isn't finished) and the two days before it. Days without entries are not counted (divide by the number of days that have entries), so with only one or two logged days it is the average of those
+- Ø 3 Tage (`src/average.ts`): what was eaten in 72 hours, divided by the days covered
+  - Today, once something is logged: the 72 hours end now (rolling), so the average doesn't drop in the morning when today only has breakfast. Nothing logged today yet: the 3 days before today. Earlier day: that day and the two before
+  - When something was eaten: the time it was logged (`created_at`) if that was on the same day, otherwise noon of its day (logged later)
+  - Hours on days without any entries don't count; divide by at least 1 day, so with only today logged it shows today's total
 - Ring percentage: value / target
 
 ## Data model (Supabase)

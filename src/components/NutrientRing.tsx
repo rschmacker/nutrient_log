@@ -7,11 +7,12 @@ type Props = {
   nutrient: Nutrient
   value: number
   target: number
+  onOpen: () => void // tapping the ring shows which foods the value comes from
 }
 
 // Progress ring: how much of the daily target is reached. The ring is full at 100 %;
 // clearly over the target it turns orange and the percentage gets a ▲ (never color alone).
-export default function NutrientRing({ nutrient, value, target }: Props) {
+export default function NutrientRing({ nutrient, value, target, onOpen }: Props) {
   const ratio = target > 0 ? value / target : 0
   const percent = Math.round(ratio * 100)
   const over = ratio > OVER_TARGET
@@ -21,10 +22,11 @@ export default function NutrientRing({ nutrient, value, target }: Props) {
   const targetText = formatNumber(target, nutrient.decimals)
   const description =
     `${nutrient.label}: ${valueText} von ${targetText} ${nutrient.unit}, ${percent} Prozent` +
-    (over ? ', deutlich über dem Richtwert' : '')
+    (over ? ', deutlich über dem Richtwert' : '') +
+    '. Zeigt, woher der Wert kommt.'
 
   return (
-    <div className={over ? 'ring over' : 'ring'} role="img" aria-label={description}>
+    <button className={over ? 'ring over' : 'ring'} aria-label={description} onClick={onOpen}>
       <svg viewBox="0 0 100 100" aria-hidden="true">
         <circle className="ring-track" cx="50" cy="50" r={RADIUS} />
         {filled > 0 && (
@@ -47,9 +49,9 @@ export default function NutrientRing({ nutrient, value, target }: Props) {
           {percentText}
         </text>
       </svg>
-      <div className="ring-name">{nutrient.short}</div>
-      <div className="ring-text">{valueText}</div>
-      <div className="ring-text">von {targetText}</div>
-    </div>
+      <span className="ring-name">{nutrient.short}</span>
+      <span className="ring-text">{valueText}</span>
+      <span className="ring-text">von {targetText}</span>
+    </button>
   )
 }

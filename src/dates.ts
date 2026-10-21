@@ -50,6 +50,11 @@ export function dayLabel(s: string): string {
   })
 }
 
+// "Sa., 08:30"
+export function weekdayAndTime(d: Date): string {
+  return d.toLocaleString('de-DE', { weekday: 'short', hour: '2-digit', minute: '2-digit' })
+}
+
 // "19.10."
 export function shortDate(s: string): string {
   return parseISODate(s).toLocaleDateString('de-DE', { day: 'numeric', month: 'numeric' })
