@@ -13,7 +13,11 @@
   --error: #fca5a5;
   --danger-line: #f87171;
   --success: #86efac;
+  --ring: #5fbf8f; /* filled part of a nutrient ring (6.9:1 on --surface) */
+  --ring-track: #2f4339; /* empty part of a ring */
+  --over: #ec835a; /* clearly over the target: ring and ▲ percentage (5.9:1 on --surface) */
   --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 14px rgb(0 0 0 / 0.25);
+  --overlay-shadow: 0 8px 24px rgb(0 0 0 / 0.45);
 
   color-scheme: dark;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -34,7 +38,11 @@
     --error: #b91c1c;
     --danger-line: #dc2626;
     --success: #166534;
+    --ring: #2f7d5b; /* 5.0:1 on white */
+    --ring-track: #dcebe2;
+    --over: #c2410c; /* 5.2:1 on white */
     --shadow: 0 1px 2px rgb(35 48 42 / 0.06), 0 4px 14px rgb(35 48 42 / 0.08);
+    --overlay-shadow: 0 8px 24px rgb(35 48 42 / 0.16);
 
     color-scheme: light;
   }
@@ -72,25 +80,45 @@ body {
 
 /* Subtle press feedback: tappable things shrink a little while pressed */
 .button,
-.pill-link {
+.pill-link,
+.icon-button,
+.step-button,
+.choice,
+.chip,
+.food-row {
   transition:
     transform 120ms ease,
     background-color 120ms ease;
 }
 
 .button:active:not(:disabled),
-.pill-link:active {
+.pill-link:active,
+.icon-button:active,
+.step-button:active:not(:disabled),
+.choice:active,
+.chip:active,
+.food-row:active {
   transform: scale(0.97);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .button,
-  .pill-link {
+  .pill-link,
+  .icon-button,
+  .step-button,
+  .choice,
+  .chip,
+  .food-row {
     transition: none;
   }
 
   .button:active,
-  .pill-link:active {
+  .pill-link:active,
+  .icon-button:active,
+  .step-button:active,
+  .choice:active,
+  .chip:active,
+  .food-row:active {
     transform: none;
   }
 }
@@ -253,4 +281,419 @@ input:focus {
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.icon-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--accent-ink);
+}
+
+.icon-button:active {
+  background: var(--pressed);
+}
+
+.panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.step-button {
+  min-height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: 1.375rem;
+  line-height: 1;
+}
+
+.step-button:active {
+  background: var(--pressed);
+}
+
+.step-button:disabled {
+  opacity: 0.4;
+}
+
+/* Two or more options side by side; the selected one is green */
+.choice {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.choice[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+/* ---------- Heute ---------- */
+
+.date-bar {
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.date-label {
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+/* While another day loads, the old numbers stay visible but faded */
+.panel.loading {
+  opacity: 0.55;
+}
+
+.ring-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem 0.375rem;
+}
+
+.ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.ring svg {
+  width: 100%;
+  max-width: 84px;
+  height: auto;
+}
+
+.ring-track,
+.ring-fill {
+  fill: none;
+  stroke-width: 12;
+}
+
+.ring-track {
+  stroke: var(--ring-track);
+}
+
+.ring-fill {
+  stroke: var(--ring);
+  stroke-linecap: round;
+}
+
+.ring-percent {
+  fill: var(--text);
+  font-size: 19px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* "▲255%" and other long values get a smaller size so they fit inside the ring */
+.ring-percent.long {
+  font-size: 15px;
+}
+
+.ring.over .ring-fill {
+  stroke: var(--over);
+}
+
+.ring.over .ring-percent {
+  fill: var(--over);
+}
+
+.ring-name {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ring-text {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.ring-caption {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+}
+
+.entry-list {
+  margin: 0;
+  padding: 0;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  list-style: none;
+}
+
+.entry-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 60px;
+  padding: 0.5rem 0.25rem 0.5rem 1rem;
+}
+
+.entry-row + .entry-row {
+  border-top: 1px solid var(--line);
+}
+
+.entry-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.entry-name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry-detail {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.delete-button {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.delete-button:active {
+  background: var(--pressed);
+}
+
+/* "+ Essen eintragen" stays at the bottom of the screen */
+.page.has-add-bar {
+  padding-bottom: 6.5rem;
+}
+
+.add-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1.5rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0), var(--bg) 45%);
+  pointer-events: none; /* only the button itself catches taps */
+}
+
+.add-bar .button {
+  display: flex;
+  max-width: 37.5rem;
+  margin: 0 auto;
+  box-shadow: var(--shadow);
+  pointer-events: auto;
+}
+
+/* ---------- Hinzufügen ---------- */
+
+.search {
+  width: 100%;
+  margin-top: 1rem;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Filter chips: one row; on narrow phones it scrolls sideways (the page itself doesn't) */
+.chips {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.75rem -1.25rem 0;
+  padding: 0 1.25rem 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.food-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.food-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 60px;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+
+.food-row:active {
+  background: var(--pressed);
+}
+
+.food-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.food-name {
+  font-weight: 600;
+}
+
+.food-portion,
+.food-kcal {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.food-kcal {
+  flex-shrink: 0;
+}
+
+.tag {
+  display: inline-block;
+  margin-left: 0.375rem;
+  padding: 0 0.375rem;
+  border: 1px solid var(--accent-ink);
+  border-radius: 6px;
+  color: var(--accent-ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: 0.1em;
+}
+
+/* Panel that slides up from the bottom (amount of a food) */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgb(0 0 0 / 0.45);
+}
+
+.sheet {
+  width: 100%;
+  max-width: 40rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
+  border-radius: 20px 20px 0 0;
+  background: var(--bg);
+  box-shadow: var(--overlay-shadow);
+  animation: sheet-in 200ms ease-out;
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet {
+    animation: none;
+  }
+}
+
+.sheet h2 {
+  margin: 0;
+  font-size: 1.375rem;
+}
+
+.sheet p {
+  margin: 0.25rem 0 0;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: 56px 1fr 56px;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.stepper .step-button {
+  min-height: 56px;
+  font-size: 1.75rem;
+}
+
+.stepper-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.sheet .sheet-summary {
+  margin-top: 0.75rem;
+  text-align: center;
 }

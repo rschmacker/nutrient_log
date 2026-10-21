@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link, Route, Routes } from 'react-router'
 import { ensureHousehold, forgetHousehold } from './household'
 import Login from './Login'
+import AddFood from './screens/AddFood'
 import Home from './screens/Home'
+import Settings from './screens/Settings'
 import { supabase } from './supabase'
 import { useSession } from './useSession'
 
@@ -67,7 +69,9 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Home email={session.user.email} />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/hinzufuegen" element={<AddFood />} />
+      <Route path="/einstellungen" element={<Settings email={session.user.email} />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

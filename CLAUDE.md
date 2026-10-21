@@ -37,8 +37,9 @@ Default daily targets (DGE, 1 to under 4 years), editable per user:
 These are guidance values for an average over several days, not goals for a single day. The app says so.
 
 ## Screens
-1. **Heute (Home)**: date bar with previous / next day (no future days); toggle "Tageswerte" / "Ø 3 Tage" (remembered on the device); 8 progress rings showing % of target, with value and target below (ring turns red above 125 %); list of the day's entries (name, amount × portion, kcal) with delete; large "+" button to add food. Links to "Lebensmittel" and "Einstellungen" in the top bar.
-2. **Hinzufügen**: search field, filter chips Alle / Lebensmittel / Gerichte / Eigene, list of foods (name, portion, kcal). Tapping a food opens the amount step: stepper in steps of 0.25 portions (start 1, min 0.25) with a live preview of kcal, Eiweiß, Eisen and Omega-3; "Eintragen" saves it for the selected day and returns to Heute.
+1. **Heute (Home, `/`, earlier days `/?tag=YYYY-MM-DD`)**: date bar with previous / next day (no future days); toggle "Ø 3 Tage" (the default) / "Tageswerte" (remembered on the device); 8 progress rings showing % of target, with value and target below; list of the day's entries (name, amount × portion, kcal) with delete (asks first); "+ Essen eintragen" button fixed at the bottom. Gear icon for "Einstellungen" in the top bar; "Lebensmittel" link comes with step 5.
+   - Rings: all in the app's green (the name below identifies each ring, so color doesn't need to); clearly over the target (> 125 %) the ring turns orange and the percentage gets a ▲, never color alone. Ring colors are checked for at least 3:1 contrast in light and dark mode (see `--ring`, `--over` in `index.css`)
+2. **Hinzufügen (`/hinzufuegen`, same `?tag=`)**: search field, filter chips Alle / Lebensmittel / Gerichte / Eigene, list of foods (name, portion, kcal). Tapping a food opens a panel from the bottom: stepper in steps of 0.25 portions (start 1, min 0.25) with a live preview of kcal, Eiweiß, Eisen and Omega-3; "Eintragen" saves it for the selected day and returns to Heute.
 3. **Lebensmittel**: sections "Meine Gerichte", "Eigene Lebensmittel", "Vorgegeben"; buttons "+ Lebensmittel" and "+ Gericht". Own foods and dishes can be edited and deleted (deleting keeps already logged entries); built-in foods are read-only, tapping one logs it. Form: name, portion text (e.g. "1 Scheibe (40 g)"), 8 nutrient values per portion (empty counts as 0). Dishes are home-cooked meals whose values per portion come from another app.
 4. **Einstellungen**: edit the targets, reset to the DGE defaults, short explanation of the reference values; Familie (members, invite the other parent by email, pending invite); account (signed in as …, sign out).
 
@@ -46,7 +47,7 @@ Navigation like the workout log: separate screens with a "‹ Zurück" link that
 
 ## Calculations
 - Day total: sum of the day's entries
-- Ø 3 Tage: for today, the three previous completed days (today is still incomplete); for an earlier day, that day and the two before. Days without entries are not counted (divide by the number of days that have entries)
+- Ø 3 Tage: the selected day (also today, even though it isn't finished) and the two days before it. Days without entries are not counted (divide by the number of days that have entries), so with only one or two logged days it is the average of those
 - Ring percentage: value / target
 
 ## Data model (Supabase)
@@ -57,7 +58,7 @@ All data belongs to a **household** (both parents), not to a single user.
 - `foods`: id (uuid), household_id (null for built-in foods), name, portion (text), kind (`food` | `dish`), kcal, protein, carbs, fat, fiber (g), iron (mg), calcium (mg), omega3 (g), created_at. Nutrient values are per portion. Unique (household_id, name)
 - `food_entries`: id, household_id, food_id (fk, set null when the food is deleted), name, portion, portions (numeric), the 8 nutrient values for the whole amount, eaten_on (date, the phone's local date), created_at. Entries copy the values at logging time, so later changes to a food don't change past days
 - `nutrient_targets`: household_id (primary key) and the 8 target values; no row = DGE defaults
-- Built-in foods: the 28 foods from the first version (seeded in `supabase/schema.sql`, updated in place when the file is run again)
+- Built-in foods: the 28 foods from the first version plus 6 added on 2026-10-21 (seeded in `supabase/schema.sql`, updated in place when the file is run again). New built-in foods go into `schema.sql` and into a migration file with the values per 100 g in a comment
 - `my_household_id()`: the logged-in user's household; used in the access rules and as the column default, so the app never sends household_id
 - `ensure_household()`: the app calls it once after login (`src/household.ts`); joins an invited household or creates one on the first login. An invite only works if it exists before the invited person's first login
 
