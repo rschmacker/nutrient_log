@@ -56,4 +56,5 @@ Auf dem iPhone die Adresse in Safari öffnen → Teilen → „Zum Home-Bildschi
 - Omega-3 in der App = Summe aller Omega-3-Fettsäuren in g (bei Fisch EPA + DHA, sonst überwiegend ALA). Die Werte der Startlebensmittel sind grobe Schätzungen.
 - Ø 3 Tage (Standardansicht): was in 72 Stunden gegessen wurde, pro Tag. Heute zählen die letzten 72 Stunden bis jetzt (so sinkt der Schnitt morgens nicht ab, nur weil heute erst das Frühstück eingetragen ist); ist heute noch nichts eingetragen, die 3 Tage davor; für frühere Tage dieser Tag und die zwei davor. Als Essenszeit gilt die Uhrzeit des Eintragens, bei nachgetragenen Einträgen 12 Uhr. Tage ohne Einträge werden nicht mitgezählt.
 - Ein Tipp auf einen Ring zeigt, welche Lebensmittel wie viel dazu beigetragen haben.
+- Neues Lebensmittel: „Frage kopieren“ erzeugt eine Frage für eine KI-App (ChatGPT, Claude …). Die Antwort dort kopieren und im Formular einfügen, dann sind die Nährwerte ausgefüllt. KI-Werte sind Schätzungen, bei Packungsware lieber mit der Packung vergleichen.
 - Einträge speichern die Nährwerte zum Zeitpunkt des Loggens, spätere Änderungen an einem Lebensmittel verändern alte Tage nicht.

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
+import AiNutrients from '../components/AiNutrients'
 import BackLink from '../components/BackLink'
 import { deleteFood, fetchFood, saveFood, type Food } from '../foods'
 import { NUTRIENTS, parseAmount, type NutrientKey, type Nutrients } from '../nutrients'
@@ -77,6 +78,19 @@ export default function FoodForm() {
 
   function updateValue(key: NutrientKey, text: string) {
     setForm((f) => f && { ...f, values: { ...f.values, [key]: text } })
+  }
+
+  // Values from the AI answer (see AiNutrients); its portion only if none is typed yet
+  function applyAiValues(values: Partial<Nutrients>, portion: string | null) {
+    setForm((f) => {
+      if (!f) return f
+      const fields = { ...f.values }
+      for (const n of NUTRIENTS) {
+        const value = values[n.key]
+        if (value !== undefined) fields[n.key] = String(value).replace('.', ',')
+      }
+      return { ...f, values: fields, portion: f.portion.trim() || !portion ? f.portion : portion }
+    })
   }
 
   async function save(e: FormEvent) {
@@ -183,6 +197,15 @@ export default function FoodForm() {
               onChange={(e) => update({ portion: e.target.value })}
             />
           </label>
+
+          {!readOnly && (
+            <AiNutrients
+              name={form.name}
+              portion={form.portion}
+              kind={form.kind}
+              onApply={applyAiValues}
+            />
+          )}
 
           <fieldset className="nutrient-fields" disabled={readOnly}>
             <legend>Nährwerte pro Portion</legend>
